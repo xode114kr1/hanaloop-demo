@@ -56,11 +56,21 @@ Do not change unrelated behavior, styling, routes, metadata, or configuration.
 
 If a broader change is necessary, explain why before making it.
 
+### Tailwind CSS Style
+
+When writing Tailwind classes with CSS custom properties, prefer Tailwind 4 shorthand syntax to avoid editor warnings.
+
+- Use `text-(--on-surface-variant)` instead of `text-[var(--on-surface-variant)]`.
+- Use `bg-(--surface-container-low)` instead of `bg-[var(--surface-container-low)]`.
+- Use `border-(--outline-variant)` instead of `border-[var(--outline-variant)]`.
+- Use arbitrary values like `p-[var(--space-md)]` only when there is no equivalent shorthand or token utility.
+
 ## Working Checklist
 
 - Read the relevant files first.
 - Check relevant `docs/**/*.md` files before writing code.
 - Check `node_modules/next/dist/docs/` before Next.js-specific edits.
+- Use Tailwind 4 CSS variable shorthand when generating utility classes.
 - Prefer local conventions over personal style.
 - Keep generated UI and styles minimal unless the user asks for a designed screen.
 - Run `npm run lint` and `npm run build` after code changes when practical.
