@@ -26,6 +26,12 @@ Before writing or changing Next.js code, read the relevant guide in `node_module
 
 Use these rules for code changes, reviews, refactors, and documentation updates.
 
+### Check Project Docs
+
+Before writing code, inspect relevant Markdown files under `docs/`.
+
+Use those files as project-specific guidance for workflows, conventions, commit messages, PR descriptions, and implementation expectations. If a docs rule conflicts with `AGENTS.md`, follow `AGENTS.md` first and note the conflict.
+
 ### Keep It Simple
 
 Prefer the simplest implementation that solves the current problem.
@@ -53,6 +59,7 @@ If a broader change is necessary, explain why before making it.
 ## Working Checklist
 
 - Read the relevant files first.
+- Check relevant `docs/**/*.md` files before writing code.
 - Check `node_modules/next/dist/docs/` before Next.js-specific edits.
 - Prefer local conventions over personal style.
 - Keep generated UI and styles minimal unless the user asks for a designed screen.
