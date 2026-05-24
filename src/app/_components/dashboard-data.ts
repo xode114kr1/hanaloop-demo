@@ -122,4 +122,4 @@ export const lifecycleStages = [
     description:
       "Carbon credits earned through a comprehensive take-back and recycle program.",
   },
-];
+] as const;
