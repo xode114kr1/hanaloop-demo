@@ -184,6 +184,20 @@ button:disabled {
   -webkit-line-clamp: 2;
 }
 
+.text-tiny {
+  font-size: 10px;
+  line-height: 14px;
+}
+
+.text-micro {
+  font-size: 11px;
+  line-height: 16px;
+}
+
+.w-65-percent {
+  width: 65%;
+}
+
 @media (width <= 768px) {
   :root {
     --space-gutter: 16px;

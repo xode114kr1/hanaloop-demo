@@ -63,7 +63,10 @@ When writing Tailwind classes with CSS custom properties, prefer Tailwind 4 shor
 - Use `text-(--on-surface-variant)` instead of `text-[var(--on-surface-variant)]`.
 - Use `bg-(--surface-container-low)` instead of `bg-[var(--surface-container-low)]`.
 - Use `border-(--outline-variant)` instead of `border-[var(--outline-variant)]`.
-- Use arbitrary values like `p-[var(--space-md)]` only when there is no equivalent shorthand or token utility.
+- Prefer scale utilities over arbitrary pixel values when the value exists in Tailwind's default scale, for example `min-w-70`, `w-70`, `h-75`, or `md:pl-70` instead of `min-w-[280px]`, `w-[280px]`, `h-[300px]`, or `md:pl-[280px]`.
+- Avoid underscore-heavy arbitrary CSS color syntax when a token or cleaner CSS color syntax is available. Prefer `bg-(--primary-container)/10` or `bg-[rgb(0_184_148/10%)]` instead of `bg-[rgb(0_184_148_/_10%)]`.
+- If a precise one-off value has no good Tailwind scale utility, prefer a named global utility class in `globals.css` over repeated arbitrary classes, for example `text-tiny`, `text-micro`, or `w-65-percent`.
+- Use arbitrary values like `p-[var(--space-md)]` only when there is no equivalent shorthand or token utility. If used, check whether Tailwind suggests a shorter equivalent and apply it.
 
 ## Working Checklist
 

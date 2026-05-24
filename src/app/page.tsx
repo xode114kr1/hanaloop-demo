@@ -10,10 +10,10 @@ export default function DashboardPage() {
     <main className="dashboard-shell">
       <Sidebar />
 
-      <div className="min-h-screen md:pl-[280px]">
+      <div className="min-h-screen md:pl-70">
         <TopBar />
 
-        <div className="container mx-auto space-y-6 p-4 md:p-[var(--space-gutter)]">
+        <div className="container mx-auto space-y-6 p-4 md:p-(--space-gutter)">
           <MetricsGrid />
 
           <section className="grid grid-cols-1 gap-6 xl:grid-cols-12">
