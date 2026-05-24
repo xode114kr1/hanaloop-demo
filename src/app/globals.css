@@ -158,6 +158,32 @@ button:disabled {
   box-shadow: var(--focus-ring);
 }
 
+.custom-scrollbar {
+  scrollbar-color: var(--primary-container) var(--surface-container-highest);
+  scrollbar-width: thin;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  height: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  border-radius: var(--radius-full);
+  background: var(--surface-container-highest);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: var(--radius-full);
+  background: var(--primary-container);
+}
+
+.text-clamp-2 {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
 @media (width <= 768px) {
   :root {
     --space-gutter: 16px;
