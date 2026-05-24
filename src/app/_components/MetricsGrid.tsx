@@ -1,6 +1,7 @@
-import { mockCompanies } from "@/mocks/companies";
-import { mockProductPcfs } from "@/mocks/product-pcfs";
-import { mockProducts } from "@/mocks/products";
+"use client";
+
+import { useEffect, useState } from "react";
+import type { CompanyInfo } from "@/lib/api";
 
 type MetricCardData = {
   title: string;
@@ -10,60 +11,71 @@ type MetricCardData = {
   detail: string;
 };
 
-const selectedCompany = mockCompanies[0];
-const selectedProducts = mockProducts.filter(
-  (product) => product.companyId === selectedCompany.id,
-);
-const totalEmissions = selectedCompany.emissions.reduce(
-  (sum, emission) => sum + emission.emissions,
-  0,
-);
-const latestYearMonth = selectedCompany.emissions
-  .map((emission) => emission.yearMonth)
-  .sort()
-  .at(-1);
-const monthlyEmissions = selectedCompany.emissions
-  .filter((emission) => emission.yearMonth === latestYearMonth)
-  .reduce((sum, emission) => sum + emission.emissions, 0);
-const highestEmissionProduct = selectedProducts
-  .map((product) => {
-    const emissions = mockProductPcfs
-      .filter((pcf) => pcf.productId === product.id)
-      .reduce((sum, pcf) => sum + pcf.emissions, 0);
+type MetricsGridProps = {
+  companyId?: string;
+};
 
-    return { name: product.name, emissions };
-  })
-  .sort((a, b) => b.emissions - a.emissions)[0];
+function getMetricCards(companyInfo: CompanyInfo): MetricCardData[] {
+  return [
+    {
+      title: "총 배출량",
+      icon: "CO",
+      value: companyInfo.totalEmissions.toLocaleString(),
+      unit: "tCO2e",
+      detail: `${companyInfo.companyName} 전체 배출량`,
+    },
+    {
+      title: "당월 배출량",
+      icon: "MO",
+      value: companyInfo.currentMonthEmissions.toLocaleString(),
+      unit: "tCO2e",
+      detail: `${companyInfo.currentYearMonth ?? "월 정보 없음"} 기준 배출량`,
+    },
+    {
+      title: "배출량이 가장 높은 제품",
+      icon: "PC",
+      value: companyInfo.highestEmissionProduct?.name ?? "데이터 없음",
+      detail: companyInfo.highestEmissionProduct
+        ? `${companyInfo.highestEmissionProduct.emissions.toLocaleString()} kg CO2e`
+        : "제품 PCF 데이터가 없습니다",
+    },
+    {
+      title: "제품 개수",
+      icon: "PR",
+      value: companyInfo.productCount.toLocaleString(),
+      unit: "개",
+      detail: `${companyInfo.companyName} 등록 제품`,
+    },
+  ];
+}
 
-const metricCards: MetricCardData[] = [
+const loadingCards: MetricCardData[] = [
   {
     title: "총 배출량",
     icon: "CO",
-    value: totalEmissions.toLocaleString(),
+    value: "Loading...",
     unit: "tCO2e",
-    detail: `${selectedCompany.name} 전체 배출량`,
+    detail: "데이터를 불러오는 중입니다",
   },
   {
     title: "당월 배출량",
     icon: "MO",
-    value: monthlyEmissions.toLocaleString(),
+    value: "Loading...",
     unit: "tCO2e",
-    detail: `${latestYearMonth} 기준 배출량`,
+    detail: "데이터를 불러오는 중입니다",
   },
   {
     title: "배출량이 가장 높은 제품",
     icon: "PC",
-    value: highestEmissionProduct?.name ?? "데이터 없음",
-    detail: highestEmissionProduct
-      ? `${highestEmissionProduct.emissions.toLocaleString()} kg CO2e`
-      : "제품 PCF 데이터가 없습니다",
+    value: "Loading...",
+    detail: "데이터를 불러오는 중입니다",
   },
   {
     title: "제품 개수",
     icon: "PR",
-    value: selectedProducts.length.toLocaleString(),
+    value: "Loading...",
     unit: "개",
-    detail: `${selectedCompany.name} 등록 제품`,
+    detail: "데이터를 불러오는 중입니다",
   },
 ];
 
@@ -91,12 +103,58 @@ function MetricCard({ card }: { card: MetricCardData }) {
   );
 }
 
-export function MetricsGrid() {
+export function MetricsGrid({ companyId }: MetricsGridProps) {
+  const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const params = new URLSearchParams();
+    if (companyId) params.set("companyId", companyId);
+
+    async function loadCompanyInfo() {
+      try {
+        const response = await fetch(`/api/company-info?${params.toString()}`, {
+          signal: controller.signal,
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message ?? "회사 정보를 불러오지 못했습니다");
+        }
+
+        setCompanyInfo(data);
+        setErrorMessage(null);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "회사 정보를 불러오지 못했습니다",
+        );
+      }
+    }
+
+    void loadCompanyInfo();
+
+    return () => controller.abort();
+  }, [companyId]);
+
+  const metricCards = companyInfo ? getMetricCards(companyInfo) : loadingCards;
+
   return (
-    <section className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
-      {metricCards.map((card) => (
-        <MetricCard card={card} key={card.title} />
-      ))}
-    </section>
+    <>
+      {errorMessage ? (
+        <div className="rounded-lg border border-(--error-container) bg-(--error-container) px-4 py-3 text-sm font-semibold text-(--on-error-container)">
+          {errorMessage}
+        </div>
+      ) : null}
+      <section className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+        {metricCards.map((card) => (
+          <MetricCard card={card} key={card.title} />
+        ))}
+      </section>
+    </>
   );
 }
