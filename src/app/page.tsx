@@ -5,7 +5,16 @@ import { TopBar } from "./_components/TopBar";
 import { UpdatesPanel } from "./_components/UpdatesPanel";
 import { Sidebar } from "../components/Sidebar";
 
-export default function DashboardPage() {
+type DashboardPageProps = {
+  searchParams: Promise<{ companyId?: string | string[] }>;
+};
+
+export default async function DashboardPage({
+  searchParams,
+}: DashboardPageProps) {
+  const { companyId } = await searchParams;
+  const selectedCompanyId = Array.isArray(companyId) ? companyId[0] : companyId;
+
   return (
     <main className="dashboard-shell">
       <Sidebar />
@@ -14,7 +23,7 @@ export default function DashboardPage() {
         <TopBar />
 
         <div className="container mx-auto space-y-6 p-4 md:p-(--space-gutter)">
-          <MetricsGrid />
+          <MetricsGrid companyId={selectedCompanyId} />
 
           <section className="grid grid-cols-1 gap-6 xl:grid-cols-12">
             <EmissionsChart />
