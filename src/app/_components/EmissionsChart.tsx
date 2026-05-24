@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -11,34 +11,14 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import type { EmissionsChartData } from "@/lib/api";
 
 type ChartPeriod = "monthly" | "yearly";
 type ChartScope = "all" | "scope1" | "scope2" | "scope3";
 
-type EmissionsDataPoint = {
-  label: string;
-  scope1: number;
-  scope2: number;
-  scope3: number;
+type EmissionsChartProps = {
+  companyId?: string;
 };
-
-const monthlyEmissions: EmissionsDataPoint[] = [
-  { label: "Jan", scope1: 740, scope2: 1220, scope3: 1680 },
-  { label: "Feb", scope1: 690, scope2: 1180, scope3: 1510 },
-  { label: "Mar", scope1: 760, scope2: 1290, scope3: 1740 },
-  { label: "Apr", scope1: 640, scope2: 1090, scope3: 1420 },
-  { label: "May", scope1: 830, scope2: 1350, scope3: 1810 },
-  { label: "Jun", scope1: 610, scope2: 980, scope3: 1310 },
-  { label: "Jul", scope1: 710, scope2: 1190, scope3: 1580 },
-  { label: "Aug", scope1: 870, scope2: 1430, scope3: 1900 },
-];
-
-const yearlyEmissions: EmissionsDataPoint[] = [
-  { label: "2021", scope1: 10100, scope2: 16500, scope3: 23800 },
-  { label: "2022", scope1: 9600, scope2: 15800, scope3: 22400 },
-  { label: "2023", scope1: 8900, scope2: 14900, scope3: 21100 },
-  { label: "2024", scope1: 7700, scope2: 13700, scope3: 19500 },
-];
 
 const periodOptions: { label: string; value: ChartPeriod }[] = [
   { label: "Monthly", value: "monthly" },
@@ -70,21 +50,57 @@ function getVisibleScopes(scope: ChartScope): Exclude<ChartScope, "all">[] {
   return [scope];
 }
 
-export function EmissionsChart() {
+export function EmissionsChart({ companyId }: EmissionsChartProps) {
   const [period, setPeriod] = useState<ChartPeriod>("monthly");
   const [scope, setScope] = useState<ChartScope>("all");
+  const [chartData, setChartData] = useState<EmissionsChartData | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [retryCount, setRetryCount] = useState(0);
 
-  const chartData = period === "monthly" ? monthlyEmissions : yearlyEmissions;
+  useEffect(() => {
+    const controller = new AbortController();
+    const params = new URLSearchParams({ period, scope });
+    if (companyId) params.set("companyId", companyId);
+
+    async function loadEmissionsChart() {
+      setIsLoading(true);
+
+      try {
+        const response = await fetch(`/api/emissions-chart?${params}`, {
+          signal: controller.signal,
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message ?? "배출량 차트를 불러오지 못했습니다");
+        }
+
+        setChartData(data);
+        setErrorMessage(null);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "배출량 차트를 불러오지 못했습니다",
+        );
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    void loadEmissionsChart();
+
+    return () => controller.abort();
+  }, [companyId, period, retryCount, scope]);
+
   const visibleScopes = useMemo(() => getVisibleScopes(scope), [scope]);
-  const selectedTotal = chartData.reduce(
-    (sum, item) =>
-      sum +
-      visibleScopes.reduce(
-        (scopeSum, visibleScope) => scopeSum + item[visibleScope],
-        0,
-      ),
-    0,
-  );
+  const selectedTotal = chartData?.total ?? 0;
+  const points = chartData?.data ?? [];
 
   return (
     <article className="dashboard-card p-(--space-md) xl:col-span-8">
@@ -94,7 +110,9 @@ export function EmissionsChart() {
             GHG Emissions Overview
           </h2>
           <p className="mt-1 text-sm text-(--on-surface-variant)">
-            {selectedTotal.toLocaleString()} tCO2e across selected boundaries
+            {isLoading
+              ? "Loading emissions data..."
+              : `${selectedTotal.toLocaleString()} tCO2e across selected boundaries`}
           </p>
         </div>
 
@@ -138,76 +156,95 @@ export function EmissionsChart() {
       </div>
 
       <div className="h-75">
-        <ResponsiveContainer height="100%" width="100%">
-          <BarChart
-            accessibilityLayer
-            data={chartData}
-            margin={{ bottom: 0, left: -16, right: 4, top: 8 }}
-          >
-            <CartesianGrid
-              stroke="var(--outline-variant)"
-              strokeDasharray="3 3"
-              vertical={false}
-            />
-            <XAxis
-              axisLine={false}
-              dataKey="label"
-              tick={{ fill: "var(--on-surface-variant)", fontSize: 12 }}
-              tickLine={false}
-            />
-            <YAxis
-              axisLine={false}
-              tick={{ fill: "var(--on-surface-variant)", fontSize: 12 }}
-              tickFormatter={(value: number) => value.toLocaleString()}
-              tickLine={false}
-              width={64}
-            />
-            <Tooltip
-              contentStyle={{
-                background: "var(--surface-container-lowest)",
-                border: "1px solid var(--outline-variant)",
-                borderRadius: "var(--radius-base)",
-                boxShadow: "var(--shadow-overlay)",
-              }}
-              cursor={{ fill: "rgb(0 184 148 / 8%)" }}
-              formatter={(value, name) => {
-                const scopeName = name as Exclude<ChartScope, "all">;
-                const emissionsValue = Number(value ?? 0);
+        {errorMessage ? (
+          <div className="flex h-full flex-col items-center justify-center rounded-lg border border-(--error-container) bg-(--error-container) p-6 text-center text-(--on-error-container)">
+            <p className="text-sm font-semibold">{errorMessage}</p>
+            <button
+              className="mt-4 rounded-md bg-(--surface-container-lowest) px-4 py-2 text-sm font-bold text-(--on-error-container)"
+              onClick={() => setRetryCount((count) => count + 1)}
+              type="button"
+            >
+              Retry
+            </button>
+          </div>
+        ) : !isLoading && points.length === 0 ? (
+          <div className="flex h-full items-center justify-center text-sm font-semibold text-(--on-surface-variant)">
+            No emissions data available
+          </div>
+        ) : (
+          <div className={isLoading ? "h-full opacity-45" : "h-full"}>
+            <ResponsiveContainer height="100%" width="100%">
+              <BarChart
+                accessibilityLayer
+                data={points}
+                margin={{ bottom: 0, left: -16, right: 4, top: 8 }}
+              >
+                <CartesianGrid
+                  stroke="var(--outline-variant)"
+                  strokeDasharray="3 3"
+                  vertical={false}
+                />
+                <XAxis
+                  axisLine={false}
+                  dataKey="label"
+                  tick={{ fill: "var(--on-surface-variant)", fontSize: 12 }}
+                  tickLine={false}
+                />
+                <YAxis
+                  axisLine={false}
+                  tick={{ fill: "var(--on-surface-variant)", fontSize: 12 }}
+                  tickFormatter={(value: number) => value.toLocaleString()}
+                  tickLine={false}
+                  width={64}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: "var(--surface-container-lowest)",
+                    border: "1px solid var(--outline-variant)",
+                    borderRadius: "var(--radius-base)",
+                    boxShadow: "var(--shadow-overlay)",
+                  }}
+                  cursor={{ fill: "rgb(0 184 148 / 8%)" }}
+                  formatter={(value, name) => {
+                    const scopeName = name as Exclude<ChartScope, "all">;
+                    const emissionsValue = Number(value ?? 0);
 
-                return [
-                  `${emissionsValue.toLocaleString()} tCO2e`,
-                  scopeLabels[scopeName],
-                ];
-              }}
-              labelStyle={{
-                color: "var(--on-surface)",
-                fontWeight: 700,
-              }}
-            />
-            <Legend
-              formatter={(value) =>
-                scopeLabels[value as Exclude<ChartScope, "all">]
-              }
-              iconType="circle"
-              wrapperStyle={{
-                color: "var(--on-surface-variant)",
-                fontSize: 12,
-                fontWeight: 700,
-                paddingTop: 16,
-              }}
-            />
-            {visibleScopes.map((visibleScope) => (
-              <Bar
-                dataKey={visibleScope}
-                fill={scopeColors[visibleScope]}
-                key={visibleScope}
-                name={visibleScope}
-                radius={0}
-                stackId={scope === "all" ? "emissions" : undefined}
-              />
-            ))}
-          </BarChart>
-        </ResponsiveContainer>
+                    return [
+                      `${emissionsValue.toLocaleString()} tCO2e`,
+                      scopeLabels[scopeName],
+                    ];
+                  }}
+                  labelStyle={{
+                    color: "var(--on-surface)",
+                    fontWeight: 700,
+                  }}
+                />
+                <Legend
+                  formatter={(value) =>
+                    scopeLabels[value as Exclude<ChartScope, "all">]
+                  }
+                  iconType="circle"
+                  wrapperStyle={{
+                    color: "var(--on-surface-variant)",
+                    fontSize: 12,
+                    fontWeight: 700,
+                    paddingTop: 16,
+                  }}
+                />
+                {visibleScopes.map((visibleScope) => (
+                  <Bar
+                    dataKey={visibleScope}
+                    fill={scopeColors[visibleScope]}
+                    key={visibleScope}
+                    name={visibleScope}
+                    radius={0}
+                    stackId={scope === "all" ? "emissions" : undefined}
+                  />
+                ))}
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </div>
 
       <div className="mt-8 flex flex-wrap gap-6 border-t border-(--outline-variant) pt-6">
