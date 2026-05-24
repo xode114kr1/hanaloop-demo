@@ -5,7 +5,6 @@ import type { CompanyInfo } from "@/lib/api";
 
 type MetricCardData = {
   title: string;
-  icon: string;
   value: string;
   unit?: string;
   detail: string;
@@ -19,21 +18,18 @@ function getMetricCards(companyInfo: CompanyInfo): MetricCardData[] {
   return [
     {
       title: "총 배출량",
-      icon: "CO",
       value: companyInfo.totalEmissions.toLocaleString(),
       unit: "tCO2e",
       detail: `${companyInfo.companyName} 전체 배출량`,
     },
     {
       title: "당월 배출량",
-      icon: "MO",
       value: companyInfo.currentMonthEmissions.toLocaleString(),
       unit: "tCO2e",
       detail: `${companyInfo.currentYearMonth ?? "월 정보 없음"} 기준 배출량`,
     },
     {
       title: "배출량이 가장 높은 제품",
-      icon: "PC",
       value: companyInfo.highestEmissionProduct?.name ?? "데이터 없음",
       detail: companyInfo.highestEmissionProduct
         ? `${companyInfo.highestEmissionProduct.emissions.toLocaleString()} kg CO2e`
@@ -41,7 +37,6 @@ function getMetricCards(companyInfo: CompanyInfo): MetricCardData[] {
     },
     {
       title: "제품 개수",
-      icon: "PR",
       value: companyInfo.productCount.toLocaleString(),
       unit: "개",
       detail: `${companyInfo.companyName} 등록 제품`,
@@ -52,27 +47,23 @@ function getMetricCards(companyInfo: CompanyInfo): MetricCardData[] {
 const loadingCards: MetricCardData[] = [
   {
     title: "총 배출량",
-    icon: "CO",
     value: "Loading...",
     unit: "tCO2e",
     detail: "데이터를 불러오는 중입니다",
   },
   {
     title: "당월 배출량",
-    icon: "MO",
     value: "Loading...",
     unit: "tCO2e",
     detail: "데이터를 불러오는 중입니다",
   },
   {
     title: "배출량이 가장 높은 제품",
-    icon: "PC",
     value: "Loading...",
     detail: "데이터를 불러오는 중입니다",
   },
   {
     title: "제품 개수",
-    icon: "PR",
     value: "Loading...",
     unit: "개",
     detail: "데이터를 불러오는 중입니다",
@@ -84,9 +75,6 @@ function MetricCard({ card }: { card: MetricCardData }) {
     <article className="dashboard-card p-(--space-md)">
       <div className="mb-3 flex items-start justify-between gap-4">
         <span className="dashboard-card-header">{card.title}</span>
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-(--surface-container-low) text-xs font-bold text-(--primary)">
-          {card.icon}
-        </span>
       </div>
       <h2 className="metric-value wrap-break-word">
         {card.value}{" "}
