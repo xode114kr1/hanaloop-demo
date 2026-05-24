@@ -26,7 +26,7 @@ export default async function DashboardPage({
           <MetricsGrid companyId={selectedCompanyId} />
 
           <section className="grid grid-cols-1 gap-6 xl:grid-cols-12">
-            <EmissionsChart />
+            <EmissionsChart companyId={selectedCompanyId} />
             <UpdatesPanel />
           </section>
 

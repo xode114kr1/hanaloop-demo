@@ -3,6 +3,7 @@ import { mockProductPcfs } from "@/mocks/product-pcfs";
 import { mockProducts } from "@/mocks/products";
 import { mockPosts } from "@/mocks/posts";
 import type { Company } from "@/types/company";
+import type { GhgScope } from "@/types/ghg-emission";
 import type { Post } from "@/types/post";
 import type { Product, ProductPcf } from "@/types/product";
 
@@ -28,6 +29,55 @@ export type CompanyInfo = {
   } | null;
   productCount: number;
 };
+
+export type EmissionsChartPeriod = "monthly" | "yearly";
+export type EmissionsChartScope = "all" | GhgScope;
+
+export type EmissionsChartPoint = {
+  label: string;
+  scope1: number;
+  scope2: number;
+  scope3: number;
+  total: number;
+};
+
+export type EmissionsChartData = {
+  companyId: string;
+  companyName: string;
+  period: EmissionsChartPeriod;
+  scope: EmissionsChartScope;
+  unit: "tCO2e";
+  total: number;
+  data: EmissionsChartPoint[];
+};
+
+type FetchEmissionsChartOptions = {
+  companyId?: string;
+  period?: EmissionsChartPeriod;
+  scope?: EmissionsChartScope;
+};
+
+const monthLabels = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+] as const;
+
+function getChartLabel(yearMonth: string, period: EmissionsChartPeriod) {
+  if (period === "yearly") return yearMonth.slice(0, 4);
+
+  const monthIndex = Number(yearMonth.slice(5, 7)) - 1;
+  return monthLabels[monthIndex] ?? yearMonth;
+}
 
 export async function fetchCompanies() {
   await delay(jitter());
@@ -89,6 +139,54 @@ export async function fetchCompanyInfo(
     currentYearMonth,
     highestEmissionProduct,
     productCount: companyProducts.length,
+  };
+}
+
+export async function fetchEmissionsChart({
+  companyId = _companies[0]?.id ?? "",
+  period = "monthly",
+  scope = "all",
+}: FetchEmissionsChartOptions = {}): Promise<EmissionsChartData> {
+  await delay(jitter());
+
+  const company = _companies.find((item) => item.id === companyId);
+  if (!company) throw new Error("Company not found");
+
+  const grouped = new Map<string, EmissionsChartPoint>();
+
+  for (const emission of company.emissions) {
+    if (scope !== "all" && emission.scope !== scope) continue;
+
+    const key =
+      period === "yearly" ? emission.yearMonth.slice(0, 4) : emission.yearMonth;
+    const current =
+      grouped.get(key) ??
+      ({
+        label: getChartLabel(emission.yearMonth, period),
+        scope1: 0,
+        scope2: 0,
+        scope3: 0,
+        total: 0,
+      } satisfies EmissionsChartPoint);
+
+    current[emission.scope] += emission.emissions;
+    current.total += emission.emissions;
+    grouped.set(key, current);
+  }
+
+  const data = [...grouped.entries()]
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([, point]) => point);
+  const total = data.reduce((sum, point) => sum + point.total, 0);
+
+  return {
+    companyId: company.id,
+    companyName: company.name,
+    period,
+    scope,
+    unit: "tCO2e",
+    total,
+    data,
   };
 }
 
