@@ -1,6 +1,71 @@
-import { metricCards } from "./dashboard-data";
+import { mockCompanies } from "@/mocks/companies";
+import { mockProductPcfs } from "@/mocks/product-pcfs";
+import { mockProducts } from "@/mocks/products";
 
-type MetricCardData = (typeof metricCards)[number];
+type MetricCardData = {
+  title: string;
+  icon: string;
+  value: string;
+  unit?: string;
+  detail: string;
+};
+
+const selectedCompany = mockCompanies[0];
+const selectedProducts = mockProducts.filter(
+  (product) => product.companyId === selectedCompany.id,
+);
+const totalEmissions = selectedCompany.emissions.reduce(
+  (sum, emission) => sum + emission.emissions,
+  0,
+);
+const latestYearMonth = selectedCompany.emissions
+  .map((emission) => emission.yearMonth)
+  .sort()
+  .at(-1);
+const monthlyEmissions = selectedCompany.emissions
+  .filter((emission) => emission.yearMonth === latestYearMonth)
+  .reduce((sum, emission) => sum + emission.emissions, 0);
+const highestEmissionProduct = selectedProducts
+  .map((product) => {
+    const emissions = mockProductPcfs
+      .filter((pcf) => pcf.productId === product.id)
+      .reduce((sum, pcf) => sum + pcf.emissions, 0);
+
+    return { name: product.name, emissions };
+  })
+  .sort((a, b) => b.emissions - a.emissions)[0];
+
+const metricCards: MetricCardData[] = [
+  {
+    title: "총 배출량",
+    icon: "CO",
+    value: totalEmissions.toLocaleString(),
+    unit: "tCO2e",
+    detail: `${selectedCompany.name} 전체 배출량`,
+  },
+  {
+    title: "당월 배출량",
+    icon: "MO",
+    value: monthlyEmissions.toLocaleString(),
+    unit: "tCO2e",
+    detail: `${latestYearMonth} 기준 배출량`,
+  },
+  {
+    title: "배출량이 가장 높은 제품",
+    icon: "PC",
+    value: highestEmissionProduct?.name ?? "데이터 없음",
+    detail: highestEmissionProduct
+      ? `${highestEmissionProduct.emissions.toLocaleString()} kg CO2e`
+      : "제품 PCF 데이터가 없습니다",
+  },
+  {
+    title: "제품 개수",
+    icon: "PR",
+    value: selectedProducts.length.toLocaleString(),
+    unit: "개",
+    detail: `${selectedCompany.name} 등록 제품`,
+  },
+];
 
 function MetricCard({ card }: { card: MetricCardData }) {
   return (
@@ -11,7 +76,7 @@ function MetricCard({ card }: { card: MetricCardData }) {
           {card.icon}
         </span>
       </div>
-      <h2 className="metric-value">
+      <h2 className="metric-value wrap-break-word">
         {card.value}{" "}
         {"unit" in card ? (
           <span className="text-sm font-normal text-(--on-surface-variant)">
@@ -20,41 +85,7 @@ function MetricCard({ card }: { card: MetricCardData }) {
         ) : null}
       </h2>
       <div className="mt-4">
-        {card.tone === "success" ? (
-          <span className="inline-flex rounded-full bg-(--primary-container)/12 px-2.5 py-1 text-xs font-bold text-(--on-primary-container)">
-            {card.detail}
-          </span>
-        ) : null}
-        {card.tone === "risk" ? (
-          <>
-            <p className="text-sm text-(--on-surface-variant)">
-              {card.detail}
-            </p>
-            <span className="mt-2 inline-flex rounded-full bg-(--error-container) px-2.5 py-1 text-xs font-bold uppercase text-(--on-error-container)">
-              High Risk
-            </span>
-          </>
-        ) : null}
-        {card.tone === "progress" ? (
-          <>
-            <div className="h-2 overflow-hidden rounded-full bg-(--outline-variant)">
-              <div className="w-65-percent h-full rounded-full bg-(--primary-container)" />
-            </div>
-            <p className="mt-3 text-sm text-(--on-surface-variant)">
-              {card.detail}
-            </p>
-          </>
-        ) : null}
-        {card.tone === "scope" ? (
-          <>
-            <p className="text-sm text-(--on-surface-variant)">
-              {card.detail}
-            </p>
-            <div className="mt-3 h-1 overflow-hidden rounded-full bg-(--secondary-container)">
-              <div className="h-full w-4/5 rounded-full bg-(--secondary)" />
-            </div>
-          </>
-        ) : null}
+        <p className="text-sm text-(--on-surface-variant)">{card.detail}</p>
       </div>
     </article>
   );
