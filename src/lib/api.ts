@@ -1,9 +1,14 @@
 import { mockCompanies } from "@/mocks/companies";
+import { mockProductPcfs } from "@/mocks/product-pcfs";
+import { mockProducts } from "@/mocks/products";
 import { mockPosts } from "@/mocks/posts";
 import type { Company } from "@/types/company";
 import type { Post } from "@/types/post";
+import type { Product, ProductPcf } from "@/types/product";
 
 const _companies: Company[] = [...mockCompanies];
+const _products: Product[] = [...mockProducts];
+const _productPcfs: ProductPcf[] = [...mockProductPcfs];
 let _posts: Post[] = [...mockPosts];
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -13,6 +18,16 @@ const maybeFail = () => Math.random() < 0.15;
 export async function fetchCompanies() {
   await delay(jitter());
   return [..._companies];
+}
+
+export async function fetchProducts() {
+  await delay(jitter());
+  return [..._products];
+}
+
+export async function fetchProductPcfs() {
+  await delay(jitter());
+  return [..._productPcfs];
 }
 
 export async function fetchPosts() {
