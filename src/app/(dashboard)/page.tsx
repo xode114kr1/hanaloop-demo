@@ -1,9 +1,9 @@
-import { EmissionsChart } from "./_components/EmissionsChart";
-import { LifecycleSection } from "./_components/LifecycleSection";
-import { MetricsGrid } from "./_components/MetricsGrid";
-import { TopBar } from "./_components/TopBar";
-import { PostPanel } from "./_components/PostPanel";
-import { Sidebar } from "./_components/Sidebar";
+import { EmissionsChart } from "@/feature/emissions-chart/EmissionsChart";
+import { LifecycleSection } from "@/feature/lifecycle-section/LifecycleSection";
+import { MetricsGrid } from "@/feature/metrics-grid/MetricsGrid";
+import { TopBar } from "@/feature/top-bar/TopBar";
+import { PostPanel } from "@/feature/post-panel/PostPanel";
+import { Sidebar } from "@/feature/sidebar/Sidebar";
 import { mockCompanies } from "@/mocks/companies";
 import { mockProductPcfs } from "@/mocks/product-pcfs";
 import { mockProducts } from "@/mocks/products";

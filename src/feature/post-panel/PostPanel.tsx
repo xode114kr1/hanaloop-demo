@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { DashboardErrorState } from "@/feature/dashboard-error-state/DashboardErrorState";
 import type { Post } from "@/types/post";
-import { DashboardErrorState } from "./DashboardErrorState";
 
 type PostPanelProps = {
   companyId?: string;

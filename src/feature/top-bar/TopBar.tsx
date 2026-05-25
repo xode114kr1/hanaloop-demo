@@ -1,7 +1,7 @@
 import {
   CompanySearch,
   type CompanySearchItem,
-} from "./CompanySearch";
+} from "@/feature/company-search/CompanySearch";
 
 type TopBarProps = {
   companies: CompanySearchItem[];
