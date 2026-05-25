@@ -31,13 +31,17 @@ export default async function DashboardPage({
   searchParams,
 }: DashboardPageProps) {
   const { companyId } = await searchParams;
-  const selectedCompanyId = Array.isArray(companyId) ? companyId[0] : companyId;
-  const hasSelectedCompany = Boolean(selectedCompanyId);
+  const requestedCompanyId = Array.isArray(companyId) ? companyId[0] : companyId;
   const companies = mockCompanies.map(({ country, id, name }) => ({
     country,
     id,
     name,
   }));
+  const selectedCompany = companies.find(
+    (company) => company.id === requestedCompanyId,
+  );
+  const selectedCompanyId = selectedCompany?.id;
+  const hasSelectedCompany = Boolean(selectedCompanyId);
   const products = hasSelectedCompany
     ? mockProducts.filter((product) => product.companyId === selectedCompanyId)
     : [];
