@@ -1,14 +1,34 @@
+"use client";
+
+import type { MouseEvent } from "react";
+
 type SidebarItem = {
   label: string;
+  href: string;
   active: boolean;
 };
 
 const sidebarItems: SidebarItem[] = [
-  { label: "Dashboard Overview", active: true },
-  { label: "GHG Emissions", active: false },
-  { label: "Recent Posts", active: false },
-  { label: "PCF Lifecycle", active: false },
+  { label: "Dashboard Overview", href: "#dashboard-overview", active: true },
+  { label: "GHG Emissions", href: "#ghg-emissions", active: false },
+  { label: "Recent Posts", href: "#recent-posts", active: false },
+  { label: "PCF Lifecycle", href: "#pcf-lifecycle", active: false },
 ];
+
+function scrollToSection(
+  event: MouseEvent<HTMLAnchorElement>,
+  href: string,
+) {
+  if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+
+  event.preventDefault();
+
+  const target = document.querySelector(href);
+  if (!target) return;
+
+  target.scrollIntoView({ behavior: "smooth", block: "start" });
+  window.history.pushState(null, "", href);
+}
 
 export function Sidebar() {
   return (
@@ -29,8 +49,9 @@ export function Sidebar() {
                 ? "bg-(--primary-container) text-(--on-primary-container)"
                 : "text-(--on-surface-variant) hover:bg-(--surface-container-highest)"
             }`}
-            href="#"
+            href={item.href}
             key={item.label}
+            onClick={(event) => scrollToSection(event, item.href)}
           >
             {item.label}
           </a>

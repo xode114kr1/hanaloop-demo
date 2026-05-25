@@ -84,7 +84,10 @@ export function PostPanel({ companyId }: PostPanelProps) {
   const visiblePosts = isLoading ? loadingPosts : posts;
 
   return (
-    <article className="dashboard-card p-(--space-md) xl:col-span-4">
+    <article
+      className="dashboard-card scroll-mt-24 p-(--space-md) xl:col-span-4"
+      id="recent-posts"
+    >
       <div className="mb-6 flex items-center justify-between gap-4">
         <h2 className="text-2xl font-semibold text-(--on-surface)">
           Recent Posts
