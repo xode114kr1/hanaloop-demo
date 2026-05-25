@@ -1,6 +1,7 @@
 "use client";
 
 import type { MouseEvent } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 type SidebarItem = {
@@ -28,14 +29,31 @@ function scrollToSection(event: MouseEvent<HTMLAnchorElement>, href: string) {
 }
 
 export function Sidebar() {
+  const pathname = usePathname();
+  const router = useRouter();
   const [activeHref, setActiveHref] = useState(sidebarItems[0]?.href ?? "");
+
+  function resetDashboard(event: MouseEvent<HTMLAnchorElement>) {
+    if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
+      return;
+    }
+
+    event.preventDefault();
+    setActiveHref(sidebarItems[0]?.href ?? "");
+    router.replace(pathname, { scroll: false });
+    window.scrollTo({ behavior: "smooth", top: 0 });
+  }
 
   return (
     <aside className="fixed left-0 top-0 z-40 hidden h-screen w-70 flex-col border-r border-(--outline-variant) bg-(--surface-bright) px-3 py-6 md:flex">
       <div className="mb-10 px-3">
-        <h1 className="text-3xl font-bold tracking-tight text-(--secondary)">
+        <a
+          className="block text-3xl font-bold tracking-tight text-(--secondary) transition hover:text-(--primary)"
+          href={pathname}
+          onClick={resetDashboard}
+        >
           HanaLoop
-        </h1>
+        </a>
       </div>
       <nav className="flex-1 space-y-1">
         {sidebarItems.map((item) => {
