@@ -110,13 +110,17 @@ export function PostPanel({ companyId }: PostPanelProps) {
         </div>
       ) : null}
 
-      {!visibleIsLoading && !visibleErrorMessage && companyPosts.length === 0 ? (
+      {!visibleIsLoading &&
+      !visibleErrorMessage &&
+      companyPosts.length === 0 ? (
         <div className="rounded-lg border border-(--outline-variant) p-5 text-sm font-semibold text-(--on-surface-variant)">
           No posts available for this company
         </div>
       ) : !visibleErrorMessage || visibleIsLoading ? (
-        <div className={visibleIsLoading ? "space-y-5 opacity-45" : "space-y-5"}>
-          {visiblePosts.map((post, index) => (
+        <div
+          className={visibleIsLoading ? "space-y-5 opacity-45" : "space-y-5"}
+        >
+          {visiblePosts.map((post) => (
             <article
               className="border-b border-(--outline-variant) pb-5 last:border-b-0 last:pb-0"
               key={post.id}
@@ -130,11 +134,6 @@ export function PostPanel({ companyId }: PostPanelProps) {
               <p className="text-clamp-2 mt-2 text-sm text-(--on-surface-variant)">
                 {post.content}
               </p>
-              {index === 0 ? (
-                <span className="mt-3 inline-flex rounded-full bg-(--primary-container)/10 px-2.5 py-1 text-xs font-bold text-(--on-primary-container)">
-                  Active briefing
-                </span>
-              ) : null}
             </article>
           ))}
         </div>
