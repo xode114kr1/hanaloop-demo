@@ -43,14 +43,18 @@ export default async function DashboardPage({
         />
 
         <div className="container mx-auto space-y-6 p-4 md:p-(--space-gutter)">
-          <MetricsGrid companyId={selectedCompanyId} />
+          <section className="scroll-mt-24" id="dashboard-overview">
+            <MetricsGrid companyId={selectedCompanyId} />
+          </section>
 
           <section className="grid grid-cols-1 gap-6 xl:grid-cols-12">
             <EmissionsChart companyId={selectedCompanyId} />
             <PostPanel companyId={selectedCompanyId} />
           </section>
 
-          <LifecycleSection productPcfs={productPcfs} products={products} />
+          <section className="scroll-mt-24" id="pcf-lifecycle">
+            <LifecycleSection productPcfs={productPcfs} products={products} />
+          </section>
         </div>
       </div>
     </main>

@@ -103,7 +103,10 @@ export function EmissionsChart({ companyId }: EmissionsChartProps) {
   const points = chartData?.data ?? [];
 
   return (
-    <article className="dashboard-card p-(--space-md) xl:col-span-8">
+    <article
+      className="dashboard-card scroll-mt-24 p-(--space-md) xl:col-span-8"
+      id="ghg-emissions"
+    >
       <div className="mb-8 flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
         <div>
           <h2 className="text-2xl font-semibold text-(--on-surface)">
