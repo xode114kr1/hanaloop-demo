@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useDebounce } from "@/hooks/useDebounce";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
 import { CompanySearchDropdown } from "./CompanySearchDropdown";
 
@@ -40,7 +41,8 @@ export function CompanySearch({
     getSelectedCompanyName(companies, selectedCompanyId),
   );
   const [isOpen, setIsOpen] = useState(false);
-  const normalizedQuery = normalizeSearchValue(query);
+  const debouncedQuery = useDebounce(query, 200);
+  const normalizedQuery = normalizeSearchValue(debouncedQuery);
 
   const filteredCompanies = useMemo(() => {
     if (!normalizedQuery) return [];
@@ -49,7 +51,7 @@ export function CompanySearch({
       company.name.toLowerCase().includes(normalizedQuery),
     );
   }, [companies, normalizedQuery]);
-  const shouldShowDropdown = isOpen && normalizedQuery.length > 0;
+  const shouldShowDropdown = isOpen && normalizeSearchValue(query).length > 0;
 
   useOutsideClick({
     ref: dropdownRef,
