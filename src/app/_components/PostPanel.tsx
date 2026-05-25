@@ -1,6 +1,6 @@
 import { posts } from "./dashboard-data";
 
-export function UpdatesPanel() {
+export function PostPanel() {
   return (
     <article className="dashboard-card p-(--space-md) xl:col-span-4">
       <div className="mb-6 flex items-center justify-between gap-4">
