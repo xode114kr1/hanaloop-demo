@@ -1,4 +1,4 @@
-import { navItems } from "../app/_components/dashboard-data";
+import { navItems } from "./dashboard-data";
 
 export function Sidebar() {
   return (
