@@ -3,6 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
+import { CompanySearchDropdown } from "./CompanySearchDropdown";
 
 export type CompanySearchItem = {
   id: string;
@@ -72,10 +73,7 @@ export function CompanySearch({
   }
 
   return (
-    <div
-      className="relative w-full min-w-0 sm:w-72"
-      ref={dropdownRef}
-    >
+    <div className="relative w-full min-w-0 sm:w-72" ref={dropdownRef}>
       <input
         aria-autocomplete="list"
         aria-controls="company-search-listbox"
@@ -100,39 +98,11 @@ export function CompanySearch({
       />
 
       {shouldShowDropdown ? (
-        <div
-          className="absolute left-0 top-full z-40 mt-2 w-full overflow-hidden rounded-lg border border-(--outline-variant) bg-(--surface-container-lowest) shadow-(--shadow-overlay)"
-          id="company-search-listbox"
-          role="listbox"
-        >
-          {filteredCompanies.length > 0 ? (
-            filteredCompanies.map((company) => (
-              <button
-                aria-selected={company.id === selectedCompanyId}
-                className={`flex w-full items-center justify-between gap-4 px-4 py-3 text-left text-sm transition hover:bg-(--surface-container-low) ${
-                  company.id === selectedCompanyId
-                    ? "bg-(--primary-container)/10 text-(--on-primary-container)"
-                    : "text-(--on-surface)"
-                }`}
-                key={company.id}
-                onClick={() => selectCompany(company)}
-                role="option"
-                type="button"
-              >
-                <span className="min-w-0 truncate font-semibold">
-                  {company.name}
-                </span>
-                <span className="text-tiny shrink-0 font-bold text-(--outline)">
-                  {company.country}
-                </span>
-              </button>
-            ))
-          ) : (
-            <div className="px-4 py-3 text-sm font-semibold text-(--on-surface-variant)">
-              No companies found
-            </div>
-          )}
-        </div>
+        <CompanySearchDropdown
+          companies={filteredCompanies}
+          onSelectCompany={selectCompany}
+          selectedCompanyId={selectedCompanyId}
+        />
       ) : null}
     </div>
   );
