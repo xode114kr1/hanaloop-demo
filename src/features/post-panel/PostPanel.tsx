@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { DashboardErrorState } from "@/features/dashboard-error-state/DashboardErrorState";
 import type { Post } from "@/types/post";
 
 type PostPanelProps = {
@@ -41,12 +42,14 @@ export function PostPanel({ companyId }: PostPanelProps) {
   const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
+    if (!companyId) return;
+
     const controller = new AbortController();
-    const params = new URLSearchParams();
-    if (companyId) params.set("companyId", companyId);
+    const params = new URLSearchParams({ companyId });
 
     async function loadPosts() {
       setIsLoading(true);
+      setErrorMessage(null);
 
       try {
         const query = params.toString();
@@ -81,36 +84,43 @@ export function PostPanel({ companyId }: PostPanelProps) {
     return () => controller.abort();
   }, [companyId, retryCount]);
 
-  const visiblePosts = isLoading ? loadingPosts : posts;
+  const visibleErrorMessage = companyId ? errorMessage : null;
+  const visibleIsLoading = companyId ? isLoading : false;
+  const companyPosts = companyId ? posts : [];
+  const visiblePosts = visibleIsLoading ? loadingPosts : companyPosts;
 
   return (
-    <article className="dashboard-card p-(--space-md) xl:col-span-4">
+    <article
+      className="dashboard-card scroll-mt-24 p-(--space-md) xl:col-span-4"
+      id="recent-posts"
+    >
       <div className="mb-6 flex items-center justify-between gap-4">
         <h2 className="text-2xl font-semibold text-(--on-surface)">
           Recent Posts
         </h2>
       </div>
 
-      {errorMessage ? (
-        <div className="mb-5 rounded-lg border border-(--error-container) bg-(--error-container) p-4 text-(--on-error-container)">
-          <p className="text-sm font-semibold">{errorMessage}</p>
-          <button
-            className="mt-3 rounded-md bg-(--surface-container-lowest) px-3 py-2 text-sm font-bold text-(--on-error-container)"
-            onClick={() => setRetryCount((count) => count + 1)}
-            type="button"
-          >
-            Retry
-          </button>
+      {visibleErrorMessage ? (
+        <div className="mb-5">
+          <DashboardErrorState
+            message={visibleErrorMessage}
+            onRetry={() => setRetryCount((count) => count + 1)}
+            title="Post 목록을 불러오지 못했습니다"
+          />
         </div>
       ) : null}
 
-      {!isLoading && !errorMessage && posts.length === 0 ? (
+      {!visibleIsLoading &&
+      !visibleErrorMessage &&
+      companyPosts.length === 0 ? (
         <div className="rounded-lg border border-(--outline-variant) p-5 text-sm font-semibold text-(--on-surface-variant)">
           No posts available for this company
         </div>
-      ) : (
-        <div className={isLoading ? "space-y-5 opacity-45" : "space-y-5"}>
-          {visiblePosts.map((post, index) => (
+      ) : !visibleErrorMessage || visibleIsLoading ? (
+        <div
+          className={visibleIsLoading ? "space-y-5 opacity-45" : "space-y-5"}
+        >
+          {visiblePosts.map((post) => (
             <article
               className="border-b border-(--outline-variant) pb-5 last:border-b-0 last:pb-0"
               key={post.id}
@@ -124,15 +134,10 @@ export function PostPanel({ companyId }: PostPanelProps) {
               <p className="text-clamp-2 mt-2 text-sm text-(--on-surface-variant)">
                 {post.content}
               </p>
-              {index === 0 ? (
-                <span className="mt-3 inline-flex rounded-full bg-(--primary-container)/10 px-2.5 py-1 text-xs font-bold text-(--on-primary-container)">
-                  Active briefing
-                </span>
-              ) : null}
             </article>
           ))}
         </div>
-      )}
+      ) : null}
     </article>
   );
 }

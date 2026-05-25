@@ -81,28 +81,35 @@ function getChartLabel(yearMonth: string, period: EmissionsChartPeriod) {
 
 export async function fetchCompanies() {
   await delay(jitter());
+  if (maybeFail()) throw new Error("Fetch failed");
+
   return [..._companies];
 }
 
 export async function fetchProducts() {
   await delay(jitter());
+  if (maybeFail()) throw new Error("Fetch failed");
+
   return [..._products];
 }
 
 export async function fetchProductPcfs() {
   await delay(jitter());
+  if (maybeFail()) throw new Error("Fetch failed");
+
   return [..._productPcfs];
 }
 
 export async function fetchPosts() {
   await delay(jitter());
+  if (maybeFail()) throw new Error("Fetch failed");
+
   return [..._posts];
 }
 
-export async function fetchPostsByCompanyId(
-  companyId = _companies[0]?.id ?? "",
-): Promise<Post[]> {
+export async function fetchPostsByCompanyId(companyId = ""): Promise<Post[]> {
   await delay(jitter());
+  if (maybeFail()) throw new Error("Fetch failed");
 
   const company = _companies.find((item) => item.id === companyId);
   if (!company) throw new Error("Company not found");
@@ -113,9 +120,10 @@ export async function fetchPostsByCompanyId(
 }
 
 export async function fetchCompanyInfo(
-  companyId = _companies[0]?.id ?? "",
+  companyId = "",
 ): Promise<CompanyInfo> {
   await delay(jitter());
+  if (maybeFail()) throw new Error("Fetch failed");
 
   const company = _companies.find((item) => item.id === companyId);
   if (!company) throw new Error("Company not found");
@@ -156,11 +164,12 @@ export async function fetchCompanyInfo(
 }
 
 export async function fetchEmissionsChart({
-  companyId = _companies[0]?.id ?? "",
+  companyId = "",
   period = "monthly",
   scope = "all",
 }: FetchEmissionsChartOptions = {}): Promise<EmissionsChartData> {
   await delay(jitter());
+  if (maybeFail()) throw new Error("Fetch failed");
 
   const company = _companies.find((item) => item.id === companyId);
   if (!company) throw new Error("Company not found");

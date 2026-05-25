@@ -11,6 +11,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { DashboardErrorState } from "@/features/dashboard-error-state/DashboardErrorState";
 import type { EmissionsChartData } from "@/lib/api";
 
 type ChartPeriod = "monthly" | "yearly";
@@ -59,12 +60,14 @@ export function EmissionsChart({ companyId }: EmissionsChartProps) {
   const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
+    if (!companyId) return;
+
     const controller = new AbortController();
-    const params = new URLSearchParams({ period, scope });
-    if (companyId) params.set("companyId", companyId);
+    const params = new URLSearchParams({ companyId, period, scope });
 
     async function loadEmissionsChart() {
       setIsLoading(true);
+      setErrorMessage(null);
 
       try {
         const response = await fetch(`/api/emissions-chart?${params}`, {
@@ -99,18 +102,24 @@ export function EmissionsChart({ companyId }: EmissionsChartProps) {
   }, [companyId, period, retryCount, scope]);
 
   const visibleScopes = useMemo(() => getVisibleScopes(scope), [scope]);
-  const selectedTotal = chartData?.total ?? 0;
-  const points = chartData?.data ?? [];
+  const visibleChartData = companyId ? chartData : null;
+  const visibleErrorMessage = companyId ? errorMessage : null;
+  const visibleIsLoading = companyId ? isLoading : false;
+  const selectedTotal = visibleChartData?.total ?? 0;
+  const points = visibleChartData?.data ?? [];
 
   return (
-    <article className="dashboard-card p-(--space-md) xl:col-span-8">
+    <article
+      className="dashboard-card scroll-mt-24 p-(--space-md) xl:col-span-8"
+      id="ghg-emissions"
+    >
       <div className="mb-8 flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
         <div>
           <h2 className="text-2xl font-semibold text-(--on-surface)">
             GHG Emissions Overview
           </h2>
           <p className="mt-1 text-sm text-(--on-surface-variant)">
-            {isLoading
+            {visibleIsLoading
               ? "Loading emissions data..."
               : `${selectedTotal.toLocaleString()} tCO2e across selected boundaries`}
           </p>
@@ -156,23 +165,18 @@ export function EmissionsChart({ companyId }: EmissionsChartProps) {
       </div>
 
       <div className="h-75">
-        {errorMessage ? (
-          <div className="flex h-full flex-col items-center justify-center rounded-lg border border-(--error-container) bg-(--error-container) p-6 text-center text-(--on-error-container)">
-            <p className="text-sm font-semibold">{errorMessage}</p>
-            <button
-              className="mt-4 rounded-md bg-(--surface-container-lowest) px-4 py-2 text-sm font-bold text-(--on-error-container)"
-              onClick={() => setRetryCount((count) => count + 1)}
-              type="button"
-            >
-              Retry
-            </button>
-          </div>
-        ) : !isLoading && points.length === 0 ? (
+        {visibleErrorMessage ? (
+          <DashboardErrorState
+            message={visibleErrorMessage}
+            onRetry={() => setRetryCount((count) => count + 1)}
+            title="배출량 차트를 불러오지 못했습니다"
+          />
+        ) : !visibleIsLoading && points.length === 0 ? (
           <div className="flex h-full items-center justify-center text-sm font-semibold text-(--on-surface-variant)">
             No emissions data available
           </div>
         ) : (
-          <div className={isLoading ? "h-full opacity-45" : "h-full"}>
+          <div className={visibleIsLoading ? "h-full opacity-45" : "h-full"}>
             <ResponsiveContainer height="100%" width="100%">
               <BarChart
                 accessibilityLayer

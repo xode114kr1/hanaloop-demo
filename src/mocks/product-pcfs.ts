@@ -7,8 +7,7 @@ export const mockProductPcfs: ProductPcf[] = [
     stageName: "Raw Material",
     stageOrder: 1,
     emissions: 12.4,
-    description:
-      "Recycled aluminum sourcing and primary material preparation.",
+    description: "국내 회수 알루미늄 조달 및 1차 소재 전처리.",
   },
   {
     id: "pcf-002",
@@ -16,8 +15,7 @@ export const mockProductPcfs: ProductPcf[] = [
     stageName: "Manufacturing",
     stageOrder: 2,
     emissions: 28.1,
-    description:
-      "Panel forming, cutting, and finishing in renewable-powered facilities.",
+    description: "재생에너지 전력을 사용하는 국내 공장에서 패널 성형, 절단, 마감.",
   },
   {
     id: "pcf-003",
@@ -25,8 +23,7 @@ export const mockProductPcfs: ProductPcf[] = [
     stageName: "Packaging",
     stageOrder: 3,
     emissions: 3.2,
-    description:
-      "Recycled cardboard packaging and water-based print materials.",
+    description: "재생 골판지 포장재와 수성 인쇄 소재 사용.",
   },
   {
     id: "pcf-004",
@@ -34,8 +31,7 @@ export const mockProductPcfs: ProductPcf[] = [
     stageName: "Transportation",
     stageOrder: 4,
     emissions: 15.7,
-    description:
-      "Regional freight delivery and maritime shipping allocation.",
+    description: "수도권 및 영남권 물류 거점으로의 국내 화물 운송.",
   },
   {
     id: "pcf-005",
@@ -43,8 +39,7 @@ export const mockProductPcfs: ProductPcf[] = [
     stageName: "Use",
     stageOrder: 5,
     emissions: 8.4,
-    description:
-      "Estimated maintenance and operational impact during product use.",
+    description: "제품 사용 기간 중 예상 유지보수와 운영 영향.",
   },
   {
     id: "pcf-006",
@@ -52,8 +47,7 @@ export const mockProductPcfs: ProductPcf[] = [
     stageName: "End of Life",
     stageOrder: 6,
     emissions: -4.1,
-    description:
-      "Take-back recycling program and recovered material credits.",
+    description: "회수 재활용 프로그램과 재생 소재 크레딧 반영.",
   },
   {
     id: "pcf-007",
@@ -61,8 +55,7 @@ export const mockProductPcfs: ProductPcf[] = [
     stageName: "Raw Material",
     stageOrder: 1,
     emissions: 18.8,
-    description:
-      "Battery materials, steel frame, and electronics sourcing.",
+    description: "배터리 소재, 철제 프레임, 전장 부품의 국내외 조달.",
   },
   {
     id: "pcf-008",
@@ -70,8 +63,7 @@ export const mockProductPcfs: ProductPcf[] = [
     stageName: "Manufacturing",
     stageOrder: 2,
     emissions: 41.6,
-    description:
-      "Vehicle assembly, battery integration, and quality testing.",
+    description: "차량 조립, 배터리 통합, 출고 전 품질 검사.",
   },
   {
     id: "pcf-009",
@@ -79,7 +71,6 @@ export const mockProductPcfs: ProductPcf[] = [
     stageName: "Transportation",
     stageOrder: 4,
     emissions: 12.9,
-    description:
-      "Distribution from assembly center to regional logistics hubs.",
+    description: "조립 센터에서 국내 권역별 물류 허브로 배송.",
   },
 ];
