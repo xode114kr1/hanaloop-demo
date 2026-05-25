@@ -3,7 +3,7 @@ import { LifecycleSection } from "./_components/LifecycleSection";
 import { MetricsGrid } from "./_components/MetricsGrid";
 import { TopBar } from "./_components/TopBar";
 import { PostPanel } from "./_components/PostPanel";
-import { Sidebar } from "../components/Sidebar";
+import { Sidebar } from "./_components/Sidebar";
 
 type DashboardPageProps = {
   searchParams: Promise<{ companyId?: string | string[] }>;
