@@ -27,7 +27,7 @@ export default async function DashboardPage({
 
           <section className="grid grid-cols-1 gap-6 xl:grid-cols-12">
             <EmissionsChart companyId={selectedCompanyId} />
-            <PostPanel />
+            <PostPanel companyId={selectedCompanyId} />
           </section>
 
           <LifecycleSection />

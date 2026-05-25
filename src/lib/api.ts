@@ -99,7 +99,9 @@ export async function fetchPosts() {
   return [..._posts];
 }
 
-export async function fetchPostsByCompanyId(companyId: string): Promise<Post[]> {
+export async function fetchPostsByCompanyId(
+  companyId = _companies[0]?.id ?? "",
+): Promise<Post[]> {
   await delay(jitter());
 
   const company = _companies.find((item) => item.id === companyId);
