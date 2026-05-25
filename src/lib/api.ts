@@ -99,6 +99,17 @@ export async function fetchPosts() {
   return [..._posts];
 }
 
+export async function fetchPostsByCompanyId(companyId: string): Promise<Post[]> {
+  await delay(jitter());
+
+  const company = _companies.find((item) => item.id === companyId);
+  if (!company) throw new Error("Company not found");
+
+  return _posts
+    .filter((post) => post.resourceUid === company.id)
+    .sort((left, right) => right.dateTime.localeCompare(left.dateTime));
+}
+
 export async function fetchCompanyInfo(
   companyId = _companies[0]?.id ?? "",
 ): Promise<CompanyInfo> {
