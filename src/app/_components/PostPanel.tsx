@@ -89,9 +89,6 @@ export function PostPanel({ companyId }: PostPanelProps) {
         <h2 className="text-2xl font-semibold text-(--on-surface)">
           Recent Posts
         </h2>
-        <button className="text-sm font-bold text-(--primary)">
-          View All
-        </button>
       </div>
 
       {errorMessage ? (
