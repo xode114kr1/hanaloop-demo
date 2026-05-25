@@ -17,6 +17,12 @@ function getStageIcon(stageName: string) {
     .toUpperCase();
 }
 
+function getStageShare(emissions: number, totalEmissions: number) {
+  if (totalEmissions === 0) return 0;
+
+  return (Math.abs(emissions) / totalEmissions) * 100;
+}
+
 export function LifecycleSection({
   productPcfs,
   products,
@@ -39,6 +45,10 @@ export function LifecycleSection({
         .filter((pcf) => pcf.productId === activeProductId)
         .sort((left, right) => left.stageOrder - right.stageOrder),
     [activeProductId, productPcfs],
+  );
+  const lifecycleTotalEmissions = lifecycleStages.reduce(
+    (sum, stage) => sum + Math.abs(stage.emissions),
+    0,
   );
 
   return (
@@ -81,32 +91,61 @@ export function LifecycleSection({
         </div>
       ) : (
         <div className="custom-scrollbar flex snap-x gap-6 overflow-x-auto pb-4">
-          {lifecycleStages.map((stage) => (
-            <article
-              className="min-w-70 snap-start rounded-xl border border-(--outline-variant) bg-white p-4 transition hover:border-(--primary-container)"
-              key={stage.id}
-            >
-              <div className="mb-4 flex items-center gap-3">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-(--surface-container-low) text-xs font-bold text-(--primary)">
-                  {getStageIcon(stage.stageName)}
-                </span>
-                <div>
-                  <span className="text-tiny font-bold uppercase text-(--outline)">
-                    Stage {stage.stageOrder.toString().padStart(2, "0")}
+          {lifecycleStages.map((stage) => {
+            const stageShare = getStageShare(
+              stage.emissions,
+              lifecycleTotalEmissions,
+            );
+
+            return (
+              <article
+                className="min-w-70 snap-start rounded-xl border border-(--outline-variant) bg-white p-4 transition hover:border-(--primary-container)"
+                key={stage.id}
+              >
+                <div className="mb-4 flex items-center gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-(--surface-container-low) text-xs font-bold text-(--primary)">
+                    {getStageIcon(stage.stageName)}
                   </span>
-                  <h3 className="font-bold text-(--on-surface)">
-                    {stage.stageName}
-                  </h3>
+                  <div>
+                    <span className="text-tiny font-bold uppercase text-(--outline)">
+                      Stage {stage.stageOrder.toString().padStart(2, "0")}
+                    </span>
+                    <h3 className="font-bold text-(--on-surface)">
+                      {stage.stageName}
+                    </h3>
+                  </div>
                 </div>
-              </div>
-              <div className="mb-4 rounded-lg bg-(--surface-container-low) p-3 text-sm font-bold text-(--on-surface)">
-                {stage.emissions.toLocaleString()} kg CO2e
-              </div>
-              <p className="text-sm text-(--on-surface-variant)">
-                {stage.description}
-              </p>
-            </article>
-          ))}
+                <div className="mb-4 rounded-lg bg-(--surface-container-low) p-3">
+                  <div className="mb-2 flex items-center justify-between gap-3 text-sm font-bold text-(--on-surface)">
+                    <span>{stage.emissions.toLocaleString()} kg CO2e</span>
+                    <span className="text-xs text-(--primary)">
+                      {stageShare.toFixed(1)}%
+                    </span>
+                  </div>
+                  <div
+                    aria-label={`${stage.stageName} contribution ${stageShare.toFixed(1)}%`}
+                    aria-valuemax={100}
+                    aria-valuemin={0}
+                    aria-valuenow={Number(stageShare.toFixed(1))}
+                    className="h-2 overflow-hidden rounded-full bg-(--surface-container-highest)"
+                    role="progressbar"
+                  >
+                    <div
+                      className={`h-full rounded-full ${
+                        stage.emissions < 0
+                          ? "bg-(--tertiary-container)"
+                          : "bg-(--primary-container)"
+                      }`}
+                      style={{ width: `${stageShare}%` }}
+                    />
+                  </div>
+                </div>
+                <p className="text-sm text-(--on-surface-variant)">
+                  {stage.description}
+                </p>
+              </article>
+            );
+          })}
         </div>
       )}
     </section>
