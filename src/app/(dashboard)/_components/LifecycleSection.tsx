@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import type { Product, ProductPcf } from "@/types/product";
 
 type LifecycleSectionProps = {
@@ -27,7 +27,6 @@ export function LifecycleSection({
   productPcfs,
   products,
 }: LifecycleSectionProps) {
-  const sliderRef = useRef<HTMLDivElement>(null);
   const [selectedProductId, setSelectedProductId] = useState(
     () => products[0]?.id ?? "",
   );
@@ -52,17 +51,6 @@ export function LifecycleSection({
     0,
   );
 
-  function scrollLifecycle(direction: "previous" | "next") {
-    const slider = sliderRef.current;
-    if (!slider) return;
-
-    const scrollDistance = Math.min(slider.clientWidth, 640);
-    slider.scrollBy({
-      behavior: "smooth",
-      left: direction === "next" ? scrollDistance : -scrollDistance,
-    });
-  }
-
   return (
     <section className="dashboard-card overflow-hidden p-(--space-md)">
       <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
@@ -74,45 +62,23 @@ export function LifecycleSection({
             Product Carbon Footprint breakdown by stage
           </p>
         </div>
-        <div className="flex w-full flex-col gap-3 sm:w-auto sm:items-end">
-          <label className="flex w-full flex-col gap-2 sm:w-70">
-            <span className="text-tiny font-bold uppercase text-(--outline)">
-              Product
-            </span>
-            <select
-              className="h-11 w-full rounded-lg border border-(--outline-variant) bg-(--surface-container-lowest) px-3 text-sm font-semibold text-(--on-surface) outline-none transition focus:border-(--primary-container) focus:shadow-(--focus-ring)"
-              disabled={products.length === 0}
-              onChange={(event) => setSelectedProductId(event.target.value)}
-              value={activeProductId}
-            >
-              {products.map((product) => (
-                <option key={product.id} value={product.id}>
-                  {product.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <div className="flex gap-2">
-            <button
-              aria-label="Scroll lifecycle stages left"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-(--outline-variant) font-bold text-(--on-surface) transition hover:bg-(--surface-container-low) disabled:opacity-45"
-              disabled={lifecycleStages.length === 0}
-              onClick={() => scrollLifecycle("previous")}
-              type="button"
-            >
-              &lt;
-            </button>
-            <button
-              aria-label="Scroll lifecycle stages right"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-(--outline-variant) font-bold text-(--on-surface) transition hover:bg-(--surface-container-low) disabled:opacity-45"
-              disabled={lifecycleStages.length === 0}
-              onClick={() => scrollLifecycle("next")}
-              type="button"
-            >
-              &gt;
-            </button>
-          </div>
-        </div>
+        <label className="flex w-full flex-col gap-2 sm:w-70">
+          <span className="text-tiny font-bold uppercase text-(--outline)">
+            Product
+          </span>
+          <select
+            className="h-11 w-full rounded-lg border border-(--outline-variant) bg-(--surface-container-lowest) px-3 text-sm font-semibold text-(--on-surface) outline-none transition focus:border-(--primary-container) focus:shadow-(--focus-ring)"
+            disabled={products.length === 0}
+            onChange={(event) => setSelectedProductId(event.target.value)}
+            value={activeProductId}
+          >
+            {products.map((product) => (
+              <option key={product.id} value={product.id}>
+                {product.name}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
 
       {products.length === 0 ? (
@@ -124,10 +90,7 @@ export function LifecycleSection({
           No PCF lifecycle data available for {selectedProduct?.name}
         </div>
       ) : (
-        <div
-          className="custom-scrollbar flex snap-x gap-6 overflow-x-auto pb-4"
-          ref={sliderRef}
-        >
+        <div className="custom-scrollbar flex snap-x gap-6 overflow-x-auto pb-4">
           {lifecycleStages.map((stage) => {
             const stageShare = getStageShare(
               stage.emissions,
