@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { Post } from "@/types/post";
+import { DashboardErrorState } from "./DashboardErrorState";
 
 type PostPanelProps = {
   companyId?: string;
@@ -48,6 +49,7 @@ export function PostPanel({ companyId }: PostPanelProps) {
 
     async function loadPosts() {
       setIsLoading(true);
+      setErrorMessage(null);
 
       try {
         const query = params.toString();
@@ -99,15 +101,12 @@ export function PostPanel({ companyId }: PostPanelProps) {
       </div>
 
       {visibleErrorMessage ? (
-        <div className="mb-5 rounded-lg border border-(--error-container) bg-(--error-container) p-4 text-(--on-error-container)">
-          <p className="text-sm font-semibold">{visibleErrorMessage}</p>
-          <button
-            className="mt-3 rounded-md bg-(--surface-container-lowest) px-3 py-2 text-sm font-bold text-(--on-error-container)"
-            onClick={() => setRetryCount((count) => count + 1)}
-            type="button"
-          >
-            Retry
-          </button>
+        <div className="mb-5">
+          <DashboardErrorState
+            message={visibleErrorMessage}
+            onRetry={() => setRetryCount((count) => count + 1)}
+            title="Post 목록을 불러오지 못했습니다"
+          />
         </div>
       ) : null}
 
@@ -115,7 +114,7 @@ export function PostPanel({ companyId }: PostPanelProps) {
         <div className="rounded-lg border border-(--outline-variant) p-5 text-sm font-semibold text-(--on-surface-variant)">
           No posts available for this company
         </div>
-      ) : (
+      ) : !visibleErrorMessage || visibleIsLoading ? (
         <div className={visibleIsLoading ? "space-y-5 opacity-45" : "space-y-5"}>
           {visiblePosts.map((post, index) => (
             <article
@@ -139,7 +138,7 @@ export function PostPanel({ companyId }: PostPanelProps) {
             </article>
           ))}
         </div>
-      )}
+      ) : null}
     </article>
   );
 }

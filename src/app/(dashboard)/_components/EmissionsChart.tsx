@@ -12,6 +12,7 @@ import {
   YAxis,
 } from "recharts";
 import type { EmissionsChartData } from "@/lib/api";
+import { DashboardErrorState } from "./DashboardErrorState";
 
 type ChartPeriod = "monthly" | "yearly";
 type ChartScope = "all" | "scope1" | "scope2" | "scope3";
@@ -66,6 +67,7 @@ export function EmissionsChart({ companyId }: EmissionsChartProps) {
 
     async function loadEmissionsChart() {
       setIsLoading(true);
+      setErrorMessage(null);
 
       try {
         const response = await fetch(`/api/emissions-chart?${params}`, {
@@ -164,16 +166,11 @@ export function EmissionsChart({ companyId }: EmissionsChartProps) {
 
       <div className="h-75">
         {visibleErrorMessage ? (
-          <div className="flex h-full flex-col items-center justify-center rounded-lg border border-(--error-container) bg-(--error-container) p-6 text-center text-(--on-error-container)">
-            <p className="text-sm font-semibold">{visibleErrorMessage}</p>
-            <button
-              className="mt-4 rounded-md bg-(--surface-container-lowest) px-4 py-2 text-sm font-bold text-(--on-error-container)"
-              onClick={() => setRetryCount((count) => count + 1)}
-              type="button"
-            >
-              Retry
-            </button>
-          </div>
+          <DashboardErrorState
+            message={visibleErrorMessage}
+            onRetry={() => setRetryCount((count) => count + 1)}
+            title="배출량 차트를 불러오지 못했습니다"
+          />
         ) : !visibleIsLoading && points.length === 0 ? (
           <div className="flex h-full items-center justify-center text-sm font-semibold text-(--on-surface-variant)">
             No emissions data available
