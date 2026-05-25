@@ -4,21 +4,21 @@ export const mockProducts: Product[] = [
   {
     id: "product-001",
     companyId: "company-001",
-    name: "Recycled Alloy Panel",
+    name: "재생 합금 패널",
   },
   {
     id: "product-002",
     companyId: "company-001",
-    name: "Low Carbon Frame Kit",
+    name: "저탄소 프레임 키트",
   },
   {
     id: "product-003",
     companyId: "company-002",
-    name: "Urban Electric Cargo Unit",
+    name: "도심형 전기 화물 유닛",
   },
   {
     id: "product-004",
     companyId: "company-003",
-    name: "Energy Efficient Control Board",
+    name: "고효율 제어 보드",
   },
 ];
