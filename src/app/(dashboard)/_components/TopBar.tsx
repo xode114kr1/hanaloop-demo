@@ -1,14 +1,21 @@
-export function TopBar() {
+import {
+  CompanySearch,
+  type CompanySearchItem,
+} from "./CompanySearch";
+
+type TopBarProps = {
+  companies: CompanySearchItem[];
+  selectedCompanyId?: string;
+};
+
+export function TopBar({ companies, selectedCompanyId }: TopBarProps) {
   return (
-    <header className="sticky top-0 z-30 border-b border-(--outline-variant) bg-(--surface) px-4 shadow-sm md:px-6">
-      <div className="container mx-auto flex h-16 items-center justify-end">
-        <div className="flex min-w-0 items-center gap-4">
-          <input
-            className="w-72 rounded-full border border-transparent bg-(--surface-container-low) py-2 pl-9 pr-4 text-sm text-(--on-surface) outline-none transition focus:border-(--primary-container) focus:shadow-(--focus-ring)"
-            placeholder="Search companies..."
-            type="search"
-          />
-        </div>
+    <header className="sticky top-0 z-30 border-b border-(--outline-variant) bg-(--surface) shadow-sm">
+      <div className="container mx-auto flex h-16 items-center justify-end p-4 md:p-(--space-gutter)">
+        <CompanySearch
+          companies={companies}
+          selectedCompanyId={selectedCompanyId}
+        />
       </div>
     </header>
   );
