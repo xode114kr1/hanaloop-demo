@@ -41,9 +41,10 @@ export function PostPanel({ companyId }: PostPanelProps) {
   const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
+    if (!companyId) return;
+
     const controller = new AbortController();
-    const params = new URLSearchParams();
-    if (companyId) params.set("companyId", companyId);
+    const params = new URLSearchParams({ companyId });
 
     async function loadPosts() {
       setIsLoading(true);
@@ -81,7 +82,10 @@ export function PostPanel({ companyId }: PostPanelProps) {
     return () => controller.abort();
   }, [companyId, retryCount]);
 
-  const visiblePosts = isLoading ? loadingPosts : posts;
+  const visibleErrorMessage = companyId ? errorMessage : null;
+  const visibleIsLoading = companyId ? isLoading : false;
+  const companyPosts = companyId ? posts : [];
+  const visiblePosts = visibleIsLoading ? loadingPosts : companyPosts;
 
   return (
     <article
@@ -94,9 +98,9 @@ export function PostPanel({ companyId }: PostPanelProps) {
         </h2>
       </div>
 
-      {errorMessage ? (
+      {visibleErrorMessage ? (
         <div className="mb-5 rounded-lg border border-(--error-container) bg-(--error-container) p-4 text-(--on-error-container)">
-          <p className="text-sm font-semibold">{errorMessage}</p>
+          <p className="text-sm font-semibold">{visibleErrorMessage}</p>
           <button
             className="mt-3 rounded-md bg-(--surface-container-lowest) px-3 py-2 text-sm font-bold text-(--on-error-container)"
             onClick={() => setRetryCount((count) => count + 1)}
@@ -107,12 +111,12 @@ export function PostPanel({ companyId }: PostPanelProps) {
         </div>
       ) : null}
 
-      {!isLoading && !errorMessage && posts.length === 0 ? (
+      {!visibleIsLoading && !visibleErrorMessage && companyPosts.length === 0 ? (
         <div className="rounded-lg border border-(--outline-variant) p-5 text-sm font-semibold text-(--on-surface-variant)">
           No posts available for this company
         </div>
       ) : (
-        <div className={isLoading ? "space-y-5 opacity-45" : "space-y-5"}>
+        <div className={visibleIsLoading ? "space-y-5 opacity-45" : "space-y-5"}>
           {visiblePosts.map((post, index) => (
             <article
               className="border-b border-(--outline-variant) pb-5 last:border-b-0 last:pb-0"
