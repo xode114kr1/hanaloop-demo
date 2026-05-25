@@ -1,0 +1,15 @@
+import { fetchPostsByCompanyId } from "@/lib/api";
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const companyId = searchParams.get("companyId") ?? undefined;
+
+  try {
+    const posts = await fetchPostsByCompanyId(companyId);
+    return Response.json(posts);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+
+    return Response.json({ message }, { status: 404 });
+  }
+}

@@ -2,7 +2,7 @@ import { EmissionsChart } from "./_components/EmissionsChart";
 import { LifecycleSection } from "./_components/LifecycleSection";
 import { MetricsGrid } from "./_components/MetricsGrid";
 import { TopBar } from "./_components/TopBar";
-import { UpdatesPanel } from "./_components/UpdatesPanel";
+import { PostPanel } from "./_components/PostPanel";
 import { Sidebar } from "../components/Sidebar";
 
 type DashboardPageProps = {
@@ -27,7 +27,7 @@ export default async function DashboardPage({
 
           <section className="grid grid-cols-1 gap-6 xl:grid-cols-12">
             <EmissionsChart companyId={selectedCompanyId} />
-            <UpdatesPanel />
+            <PostPanel companyId={selectedCompanyId} />
           </section>
 
           <LifecycleSection />
