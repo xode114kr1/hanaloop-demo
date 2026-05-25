@@ -99,9 +99,7 @@ export async function fetchPosts() {
   return [..._posts];
 }
 
-export async function fetchPostsByCompanyId(
-  companyId = _companies[0]?.id ?? "",
-): Promise<Post[]> {
+export async function fetchPostsByCompanyId(companyId = ""): Promise<Post[]> {
   await delay(jitter());
 
   const company = _companies.find((item) => item.id === companyId);
@@ -113,7 +111,7 @@ export async function fetchPostsByCompanyId(
 }
 
 export async function fetchCompanyInfo(
-  companyId = _companies[0]?.id ?? "",
+  companyId = "",
 ): Promise<CompanyInfo> {
   await delay(jitter());
 
@@ -156,7 +154,7 @@ export async function fetchCompanyInfo(
 }
 
 export async function fetchEmissionsChart({
-  companyId = _companies[0]?.id ?? "",
+  companyId = "",
   period = "monthly",
   scope = "all",
 }: FetchEmissionsChartOptions = {}): Promise<EmissionsChartData> {
