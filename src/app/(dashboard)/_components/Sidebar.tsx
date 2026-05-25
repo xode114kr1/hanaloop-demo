@@ -1,4 +1,14 @@
-import { navItems } from "./dashboard-data";
+type SidebarItem = {
+  label: string;
+  active: boolean;
+};
+
+const sidebarItems: SidebarItem[] = [
+  { label: "Dashboard Overview", active: true },
+  { label: "GHG Emissions", active: false },
+  { label: "Recent Posts", active: false },
+  { label: "PCF Lifecycle", active: false },
+];
 
 export function Sidebar() {
   return (
@@ -12,7 +22,7 @@ export function Sidebar() {
         </p>
       </div>
       <nav className="flex-1 space-y-1">
-        {navItems.map((item) => (
+        {sidebarItems.map((item) => (
           <a
             className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-semibold transition-colors ${
               item.active
@@ -22,9 +32,6 @@ export function Sidebar() {
             href="#"
             key={item.label}
           >
-            <span className="text-tiny flex h-7 w-7 items-center justify-center rounded-md border border-(--outline-variant) font-bold">
-              {item.icon}
-            </span>
             {item.label}
           </a>
         ))}
