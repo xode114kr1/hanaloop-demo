@@ -11,7 +11,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { DashboardErrorState } from "@/feature/dashboard-error-state/DashboardErrorState";
+import { DashboardErrorState } from "@/features/dashboard-error-state/DashboardErrorState";
 import type { EmissionsChartData } from "@/lib/api";
 
 type ChartPeriod = "monthly" | "yearly";

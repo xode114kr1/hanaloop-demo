@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DashboardErrorState } from "@/feature/dashboard-error-state/DashboardErrorState";
+import { DashboardErrorState } from "@/features/dashboard-error-state/DashboardErrorState";
 import type { CompanyInfo } from "@/lib/api";
 
 type MetricCardData = {
