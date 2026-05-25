@@ -17,14 +17,15 @@ export default async function DashboardPage({
 }: DashboardPageProps) {
   const { companyId } = await searchParams;
   const selectedCompanyId = Array.isArray(companyId) ? companyId[0] : companyId;
+  const hasSelectedCompany = Boolean(selectedCompanyId);
   const companies = mockCompanies.map(({ country, id, name }) => ({
     country,
     id,
     name,
   }));
-  const products = mockProducts.filter(
-    (product) => product.companyId === selectedCompanyId,
-  );
+  const products = hasSelectedCompany
+    ? mockProducts.filter((product) => product.companyId === selectedCompanyId)
+    : [];
   const productIds = new Set(products.map((product) => product.id));
   const productPcfs = mockProductPcfs.filter((pcf) =>
     productIds.has(pcf.productId),
