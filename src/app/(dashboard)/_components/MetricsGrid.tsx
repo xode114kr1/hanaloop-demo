@@ -96,9 +96,10 @@ export function MetricsGrid({ companyId }: MetricsGridProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!companyId) return;
+
     const controller = new AbortController();
-    const params = new URLSearchParams();
-    if (companyId) params.set("companyId", companyId);
+    const params = new URLSearchParams({ companyId });
 
     async function loadCompanyInfo() {
       try {
@@ -129,13 +130,17 @@ export function MetricsGrid({ companyId }: MetricsGridProps) {
     return () => controller.abort();
   }, [companyId]);
 
-  const metricCards = companyInfo ? getMetricCards(companyInfo) : loadingCards;
+  const visibleCompanyInfo = companyId ? companyInfo : null;
+  const visibleErrorMessage = companyId ? errorMessage : null;
+  const metricCards = visibleCompanyInfo
+    ? getMetricCards(visibleCompanyInfo)
+    : loadingCards;
 
   return (
     <>
-      {errorMessage ? (
+      {visibleErrorMessage ? (
         <div className="rounded-lg border border-(--error-container) bg-(--error-container) px-4 py-3 text-sm font-semibold text-(--on-error-container)">
-          {errorMessage}
+          {visibleErrorMessage}
         </div>
       ) : null}
       <section className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
