@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { CompanyInfo } from "@/lib/api";
+import { DashboardErrorState } from "./DashboardErrorState";
 
 type MetricCardData = {
   title: string;
@@ -94,6 +95,8 @@ function MetricCard({ card }: { card: MetricCardData }) {
 export function MetricsGrid({ companyId }: MetricsGridProps) {
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     if (!companyId) return;
@@ -102,6 +105,10 @@ export function MetricsGrid({ companyId }: MetricsGridProps) {
     const params = new URLSearchParams({ companyId });
 
     async function loadCompanyInfo() {
+      setIsLoading(true);
+      setErrorMessage(null);
+      setCompanyInfo(null);
+
       try {
         const response = await fetch(`/api/company-info?${params.toString()}`, {
           signal: controller.signal,
@@ -122,16 +129,21 @@ export function MetricsGrid({ companyId }: MetricsGridProps) {
             ? error.message
             : "회사 정보를 불러오지 못했습니다",
         );
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
       }
     }
 
     void loadCompanyInfo();
 
     return () => controller.abort();
-  }, [companyId]);
+  }, [companyId, retryCount]);
 
   const visibleCompanyInfo = companyId ? companyInfo : null;
   const visibleErrorMessage = companyId ? errorMessage : null;
+  const visibleIsLoading = companyId ? isLoading : false;
   const metricCards = visibleCompanyInfo
     ? getMetricCards(visibleCompanyInfo)
     : loadingCards;
@@ -139,15 +151,19 @@ export function MetricsGrid({ companyId }: MetricsGridProps) {
   return (
     <>
       {visibleErrorMessage ? (
-        <div className="rounded-lg border border-(--error-container) bg-(--error-container) px-4 py-3 text-sm font-semibold text-(--on-error-container)">
-          {visibleErrorMessage}
-        </div>
+        <DashboardErrorState
+          message={visibleErrorMessage}
+          onRetry={() => setRetryCount((count) => count + 1)}
+          title="대시보드 지표를 불러오지 못했습니다"
+        />
       ) : null}
-      <section className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
-        {metricCards.map((card) => (
-          <MetricCard card={card} key={card.title} />
-        ))}
-      </section>
+      {!visibleErrorMessage || visibleIsLoading ? (
+        <section className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+          {metricCards.map((card) => (
+            <MetricCard card={card} key={card.title} />
+          ))}
+        </section>
+      ) : null}
     </>
   );
 }
