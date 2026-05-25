@@ -15,10 +15,7 @@ const sidebarItems: SidebarItem[] = [
   { label: "PCF Lifecycle", href: "#pcf-lifecycle" },
 ];
 
-function scrollToSection(
-  event: MouseEvent<HTMLAnchorElement>,
-  href: string,
-) {
+function scrollToSection(event: MouseEvent<HTMLAnchorElement>, href: string) {
   if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
 
   event.preventDefault();
@@ -37,11 +34,8 @@ export function Sidebar() {
     <aside className="fixed left-0 top-0 z-40 hidden h-screen w-70 flex-col border-r border-(--outline-variant) bg-(--surface-bright) px-3 py-6 md:flex">
       <div className="mb-10 px-3">
         <h1 className="text-3xl font-bold tracking-tight text-(--secondary)">
-          CarbonMetric
+          HanaLoop
         </h1>
-        <p className="mt-1 text-sm text-(--on-surface-variant)">
-          Institutional Tier
-        </p>
       </div>
       <nav className="flex-1 space-y-1">
         {sidebarItems.map((item) => {
