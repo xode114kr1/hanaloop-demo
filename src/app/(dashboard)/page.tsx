@@ -5,6 +5,8 @@ import { TopBar } from "./_components/TopBar";
 import { PostPanel } from "./_components/PostPanel";
 import { Sidebar } from "./_components/Sidebar";
 import { mockCompanies } from "@/mocks/companies";
+import { mockProductPcfs } from "@/mocks/product-pcfs";
+import { mockProducts } from "@/mocks/products";
 
 type DashboardPageProps = {
   searchParams: Promise<{ companyId?: string | string[] }>;
@@ -15,11 +17,19 @@ export default async function DashboardPage({
 }: DashboardPageProps) {
   const { companyId } = await searchParams;
   const selectedCompanyId = Array.isArray(companyId) ? companyId[0] : companyId;
+  const activeCompanyId = selectedCompanyId ?? mockCompanies[0]?.id;
   const companies = mockCompanies.map(({ country, id, name }) => ({
     country,
     id,
     name,
   }));
+  const products = mockProducts.filter(
+    (product) => product.companyId === activeCompanyId,
+  );
+  const productIds = new Set(products.map((product) => product.id));
+  const productPcfs = mockProductPcfs.filter((pcf) =>
+    productIds.has(pcf.productId),
+  );
 
   return (
     <main className="dashboard-shell">
@@ -40,7 +50,7 @@ export default async function DashboardPage({
             <PostPanel companyId={selectedCompanyId} />
           </section>
 
-          <LifecycleSection />
+          <LifecycleSection productPcfs={productPcfs} products={products} />
         </div>
       </div>
     </main>
