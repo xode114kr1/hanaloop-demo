@@ -3,7 +3,7 @@ import type { Company } from "@/types/company";
 export const mockCompanies: Company[] = [
   {
     id: "company-001",
-    name: "하나루프 소재",
+    name: "Hanaloop Materials",
     country: "KR",
     emissions: [
       {
@@ -46,7 +46,7 @@ export const mockCompanies: Company[] = [
   },
   {
     id: "company-002",
-    name: "그린프레이트 시스템즈",
+    name: "GreenFreight Systems",
     country: "KR",
     emissions: [
       {
@@ -89,7 +89,7 @@ export const mockCompanies: Company[] = [
   },
   {
     id: "company-003",
-    name: "에코포지 전자",
+    name: "EcoForge Electronics",
     country: "KR",
     emissions: [
       {
